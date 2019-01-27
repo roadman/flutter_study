@@ -37,6 +37,11 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
@@ -45,47 +50,36 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text('App Name'),
       ),
       body: Center(
-        child: MyRenderBoxWidget(),
+        child: CustomPaint(
+          painter: MyPainter(),
+        ),
       ),
     );
   }
 }
 
-class MyRenderBoxWidget extends SingleChildRenderObjectWidget {
+class MyPainter extends CustomPainter {
   @override
-  RenderObject createRenderObject(BuildContext context) {
-    return _MyRenderBox();
-  }
-}
-
-class _MyRenderBox extends RenderBox {
-  ui.Image _img;
-  Offset _pos;
-
-  @override
-  bool hitTest(HitTestResult result, { @required Offset position }) {
-    result.add(BoxHitTestEntry(this, position));
-    return true;
-  }
-
-  @override
-  void handleEvent(PointerEvent event, HitTestEntry entry) {
-    super.handleEvent(event, entry);
-    _pos = event.position;
-    markNeedsPaint();
-  }
-
-  @override
-  void paint(PaintingContext context, Offset offset) {
-    Canvas c = context.canvas;
-    c.drawColor(Colors.black, BlendMode.clear);
-    if(_pos != null) {
-      Paint p = Paint();
-      p.style = PaintingStyle.fill;
-      for (var i = 0; i < 10; i++) {
-        p.color = Color.fromARGB(50, 255, 255, 255);
-        c.drawCircle(_pos, i * 5.0, p);
-      }
+  void paint(Canvas canvas, Size size) {
+    Paint p = Paint();
+    p.style = PaintingStyle.fill;
+    p.color = Colors.black;
+    print(size);
+    for (var i = 0; i < 100; i++) {
+      Random rnd = Random();
+      double w = rnd.nextInt(300).toDouble() - 150;
+      double h = rnd.nextInt(300).toDouble() - 150;
+      double cr = rnd.nextInt(50).toDouble();
+      int r = rnd.nextInt(255);
+      int g = rnd.nextInt(255);
+      int b = rnd.nextInt(255);
+      p.color = Color.fromARGB(50, r, g, b);
+      canvas.drawCircle(Offset(w,h), cr, p);
     }
   }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => true;
+
 }
+
