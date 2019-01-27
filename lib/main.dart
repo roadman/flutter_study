@@ -16,7 +16,13 @@ class MyApp extends StatelessWidget {
         accentColor: const Color(0xFF2196f3),
         canvasColor: const Color(0xFFfafafa),
       ),
-      home: new FirstScreen(),
+//      home: new FirstScreen(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => FirstScreen(),
+        '/second': (context) => SecondScreen('Second'),
+        '/third': (context) => SecondScreen('Third'),
+      },
     );
   }
 }
@@ -68,12 +74,7 @@ class _FirstScreenState extends State<FirstScreen> {
           ),
         ],
         onTap: (int value) {
-          if(value == 1) {
-            Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => SecondScreen(_input)),
-            );
-          }
+          if(value == 1) Navigator.pushNamed(context, '/second');
         },
       ),
     );
@@ -117,6 +118,7 @@ class SecondScreen extends StatelessWidget {
         ],
         onTap: (int value) {
           if(value == 0) Navigator.pop(context);
+          if(value == 1) Navigator.pushNamed(context, '/third');
         },
       ),
     );
