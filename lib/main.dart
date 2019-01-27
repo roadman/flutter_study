@@ -91,11 +91,11 @@ class _MyRenderBox extends RenderBox {
   @override
   void paint(PaintingContext context, Offset offset) {
     Canvas c = context.canvas;
-    int dx = offset.dx.toInt();
-    int dy = offset.dy.toInt();
+    double dx = offset.dx + 30.0;
+    double dy = offset.dy + 30.0;
 
     if (_img != null) {
-      c.drawImage(_img, Offset(dx + 50.0, dy + 50.0), Paint());
+      c.drawImage(_img, Offset(dx, dy), Paint());
       print("draw img.");
     } else {
       print("_img is null.");
@@ -104,18 +104,14 @@ class _MyRenderBox extends RenderBox {
     Paint p = Paint();
     p.style = PaintingStyle.fill;
 
-    c.save();
-    
-    Rect r = Rect.fromLTWH(dx + 70.0, dy + 70.0, 130.0, 130.0);
-    c.clipRect(r);
-    c.drawColor(Color.fromARGB(255, 0, 0, 255), BlendMode.multiply);
+    p.blendMode = BlendMode.darken;
 
-    c.restore();
-
-    r = Rect.fromLTWH(dx + 200.0, dy + 200.0, 130.0, 130.0);
-    c.clipRect(r);
-    c.drawColor(Color.fromARGB(255, 0, 255, 0), BlendMode.lighten);
-
-    c.restore();
+    for (var i = 0; i < 10; i++) {
+      for (var j = 0; j < 10; j++) {
+        p.color = Color.fromARGB(255, 25 * i, 0, 25 * i);
+        Rect r = Rect.fromLTWH(dx + 30.0 * i, dy + 30.0 * j, 30.0, 30.0);
+        c.drawOval(r, p);
+      }
+    }
   }
 }
