@@ -58,42 +58,46 @@ class MyRenderBoxWidget extends SingleChildRenderObjectWidget {
 }
 
 class _MyRenderBox extends RenderBox {
+  ui.Image _img;
+
   @override
-  bool hitTest(HitTestResult result, { @required Offset position}) {
+  bool hitTest(HitTestResult result, { @required Offset position }) {
     return true;
   }
+
+  _MyRenderBox() {
+    loadAssetImage('image.jpg');
+  }
+
+  loadAssetImage(String fname) => rootBundle.load
+    ("assets/$fname").then((bd) {
+      Uint8List u8lst = Uint8List.view(bd.buffer);
+      ui.instantiateImageCodec(u8lst).then((codec) {
+        codec.getNextFrame().then(
+            (frameInfo) {
+              _img = frameInfo.image;
+              markNeedsPaint();
+              print("_img created: $_img");
+            }
+        );
+      });
+  });
 
   @override
   void paint(PaintingContext context, Offset offset) {
     Canvas c = context.canvas;
-
     int dx = offset.dx.toInt();
     int dy = offset.dy.toInt();
+
     Paint p = Paint();
-
-    p.style = PaintingStyle.fill;
-    p.color = Color.fromARGB(150, 200, 0, 255);
-    Rect r = Rect.fromLTWH(dx + 50.0, dy + 50.0, 150.0, 150.0);
-    c.drawRect(r, p);
-
-    p.style = PaintingStyle.stroke;
-    p.color = Colors.red;
-    p.strokeWidth = 10.0;
-    r = Rect.fromLTWH(dx + 100.0, dy + 100.0, 150.0, 150.0);
-    c.drawRect(r, p);
-
-    p.style = PaintingStyle.fill;
-    p.color = Color.fromARGB(150, 0, 200, 255);
-    Offset ctr = Offset(dx + 100.0, dy + 400.0);
-    c.drawCircle(ctr, 75.0, p);
-
-    p.style = PaintingStyle.stroke;
-    p.color = Color.fromARGB(150, 200, 0, 255);
-    p.strokeWidth = 10.0;
-    r = Rect.fromLTWH(dx + 100.0, dy + 350.0, 200.0, 150.0);
-    c.drawOval(r, p);
-
-    r = Rect.fromLTWH(dx + 50.0, dy + 400.0, 150.0, 200.0);
-    c.drawOval(r, p);
+    Offset off = Offset(dx + 50.0, dy + 50.0);
+    Rect r = Rect.fromLTWH(dx + 50.0, dy + 50.0, 200.0, 200.0);
+    if (_img != null) {
+      Rect r0 = Rect.fromLTWH(0.0, 0.0, _img.width.toDouble(), _img.height.toDouble());
+      c.drawImageRect(_img, r0, r, p);
+      print('draw _img.');
+    } else {
+      print('_img is null.');
+    }
   }
 }
