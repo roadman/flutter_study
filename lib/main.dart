@@ -90,32 +90,22 @@ class _MyRenderBox extends RenderBox {
     int dx = offset.dx.toInt();
     int dy = offset.dy.toInt();
 
-    Path path = Path();
-    
-    Rect r = Rect.fromLTWH(dx + 50.0, dy + 50.0, 75.0, 75.0);
-    path.addOval(r);
-    r = Rect.fromLTWH(dx + 75.0, dy + 75.0, 125.0, 125.0);
-    path.addOval(r);
-    r = Rect.fromLTWH(dx + 125.0, dy + 125.0, 175.0, 175.0);
-    path.addOval(r);
-
-    c.save(); // 座標軸を保存する
+    c.save();
+    c.clipRect(Rect.fromLTWH(dx + 75.0, dy + 75.0, 150.0, 150.0));
 
     Paint p = Paint();
+
     p.color = Color.fromARGB(150, 255, 0, 0);
     p.style = PaintingStyle.fill;
-    c.drawPath(path, p);
-
-    c.translate(0.0, 100.0); // 座標軸をずらす
-    p.color = Color.fromARGB(150, 0, 0, 255);
-    c.drawPath(path, p);
-
+    Offset off = Offset(dx + 100.0, dy + 100.0);
+    c.drawCircle(off, 50.0, p);
     p.color = Color.fromARGB(150, 0, 255, 0);
-    c.rotate(-0.5 * pi);  // 座標軸を回転する
-    c.translate(-600.0, -200.0);  // 座標軸をずらす
-    c.scale(1 * 1.75);
-    c.drawPath(path, p);
+    off = Offset(dx + 150.0, dy + 150.0);
+    c.drawCircle(off, 75.0, p);
+    p.color = Color.fromARGB(150, 0, 0, 255);
+    off = Offset(dx + 200.0, dy + 200.0);
+    c.drawCircle(off, 100.0, p);
 
-    c.restore();  // 座標軸を元に戻す
+    c.restore();
   }
 }
