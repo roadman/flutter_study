@@ -59,52 +59,37 @@ class MyRenderBoxWidget extends SingleChildRenderObjectWidget {
 }
 
 class _MyRenderBox extends RenderBox {
-  ui.Image _img;
-
-  @override
-  bool hitTest(HitTestResult result, { @required Offset position }) {
-    return true;
-  }
-
-  _MyRenderBox() {
-    loadAssetImage('image.jpg');
-  }
-
-  loadAssetImage(String fname) => rootBundle.load
-    ("assets/$fname").then((bd) {
-      Uint8List u8lst = Uint8List.view(bd.buffer);
-      ui.instantiateImageCodec(u8lst).then((codec) {
-        codec.getNextFrame().then(
-            (frameInfo) {
-              _img = frameInfo.image;
-              markNeedsPaint();
-              print("_img created: $_img");
-            }
-        );
-      });
-  });
-
   @override
   void paint(PaintingContext context, Offset offset) {
     Canvas c = context.canvas;
     int dx = offset.dx.toInt();
     int dy = offset.dy.toInt();
 
-    c.save();
-    c.clipRect(Rect.fromLTWH(dx + 75.0, dy + 75.0, 150.0, 150.0));
+    Path path = Path();
+    Rect r = Rect.fromLTWH(dx + 50.0, dy + 50.0, 75.0, 75.0);
+    path.addOval(r);
+    r = Rect.fromLTWH(dx + 75.0, dy + 75.0, 125.0, 125.0);
+    path.addOval(r);
+    r = Rect.fromLTWH(dx + 125.0, dy + 125.0, 175.0, 175.0);
+    path.addOval(r);
 
     Paint p = Paint();
-
-    p.color = Color.fromARGB(150, 255, 0, 0);
     p.style = PaintingStyle.fill;
-    Offset off = Offset(dx + 100.0, dy + 100.0);
-    c.drawCircle(off, 50.0, p);
-    p.color = Color.fromARGB(150, 0, 255, 0);
-    off = Offset(dx + 150.0, dy + 150.0);
-    c.drawCircle(off, 75.0, p);
-    p.color = Color.fromARGB(150, 0, 0, 255);
-    off = Offset(dx + 200.0, dy + 200.0);
-    c.drawCircle(off, 100.0, p);
+
+    c.save();
+    c.clipPath(path);
+
+    for (var i = 0; i < 100; i++) {
+      Random rnd = Random();
+      double w = rnd.nextInt(dx + 300).toDouble();
+      double h = rnd.nextInt(dx + 300).toDouble();
+      double cr = rnd.nextInt(50).toDouble();
+      int r = rnd.nextInt(255);
+      int g = rnd.nextInt(255);
+      int b = rnd.nextInt(255);
+      p.color = Color.fromARGB(50, r, g, b);
+      c.drawCircle(Offset(w, h), cr, p);
+    }
 
     c.restore();
   }
