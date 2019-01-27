@@ -6,6 +6,7 @@ import 'package:flutter/gestures.dart';
 import 'dart:typed_data';
 import 'dart:async';
 import 'dart:ui' as ui;
+import 'dart:math';
 
 void main() {
   runApp(new MyApp());
@@ -89,15 +90,32 @@ class _MyRenderBox extends RenderBox {
     int dx = offset.dx.toInt();
     int dy = offset.dy.toInt();
 
+    Path path = Path();
+    
+    Rect r = Rect.fromLTWH(dx + 50.0, dy + 50.0, 75.0, 75.0);
+    path.addOval(r);
+    r = Rect.fromLTWH(dx + 75.0, dy + 75.0, 125.0, 125.0);
+    path.addOval(r);
+    r = Rect.fromLTWH(dx + 125.0, dy + 125.0, 175.0, 175.0);
+    path.addOval(r);
+
+    c.save(); // 座標軸を保存する
+
     Paint p = Paint();
-    Offset off = Offset(dx + 50.0, dy + 50.0);
-    Rect r = Rect.fromLTWH(dx + 50.0, dy + 50.0, 200.0, 200.0);
-    if (_img != null) {
-      Rect r0 = Rect.fromLTWH(0.0, 0.0, _img.width.toDouble(), _img.height.toDouble());
-      c.drawImageRect(_img, r0, r, p);
-      print('draw _img.');
-    } else {
-      print('_img is null.');
-    }
+    p.color = Color.fromARGB(150, 255, 0, 0);
+    p.style = PaintingStyle.fill;
+    c.drawPath(path, p);
+
+    c.translate(0.0, 100.0); // 座標軸をずらす
+    p.color = Color.fromARGB(150, 0, 0, 255);
+    c.drawPath(path, p);
+
+    p.color = Color.fromARGB(150, 0, 255, 0);
+    c.rotate(-0.5 * pi);  // 座標軸を回転する
+    c.translate(-600.0, -200.0);  // 座標軸をずらす
+    c.scale(1 * 1.75);
+    c.drawPath(path, p);
+
+    c.restore();  // 座標軸を元に戻す
   }
 }
