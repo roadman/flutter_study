@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'dart:async';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+
 
 void main() {
   runApp(new MyApp());
@@ -20,8 +24,6 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => FirstScreen(),
-        '/second': (context) => SecondScreen('Second'),
-        '/third': (context) => SecondScreen('Third'),
       },
     );
   }
@@ -37,7 +39,7 @@ class FirstScreen extends StatefulWidget {
 
 class _FirstScreenState extends State<FirstScreen> {
   final _controller = TextEditingController();
-  String _input;
+  final _fname = 'mydata.txt';
 
   @override
   Widget build(BuildContext context) {
@@ -52,77 +54,81 @@ class _FirstScreenState extends State<FirstScreen> {
               color: Colors.red,
             )
           ),
-          Padding(
-            padding: EdgeInsets.all(10.0),
-          ),
+          Padding( padding: EdgeInsets.all(20.0) ),
           TextField(
             controller: _controller,
-            onChanged: changeField,
           )
         ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 1,
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            title: Text('Home'),
-            icon: Icon(Icons.home),
-          ),
-          BottomNavigationBarItem(
-            title: Text('next'),
-            icon: Icon(Icons.navigate_next),
-          ),
-        ],
-        onTap: (int value) {
-          if(value == 1) Navigator.pushNamed(context, '/second');
-        },
-      ),
-    );
-  }
-
-  void changeField(String val) => _input = val;
-}
-
-class SecondScreen extends StatelessWidget {
-  final String _value;
-
-  SecondScreen(this._value);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Next'),
-      ),
-      body: Center(
-        child: Container(
-          child: Text(
-            'you typed: "$_value".',
-            style: TextStyle(
-              color: Colors.red,
-            ),
-          ),
-        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            title: Text('prev'),
-            icon: Icon(Icons.navigate_before),
+            title: Text('Save'),
+            icon: Icon(Icons.save),
           ),
           BottomNavigationBarItem(
-            title: Text('?'),
-            icon: Icon(Icons.android),
+            title: Text('Load'),
+            icon: Icon(Icons.open_in_new),
           ),
         ],
         onTap: (int value) {
-          if(value == 0) Navigator.pop(context);
-          if(value == 1) Navigator.pushNamed(context, '/third');
+          switch(value) {
+            case 0:
+              saveIt(_controller.text);
+              setState(() {
+                _controller.text = '';
+              });
+              showDialog(
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                  title: Text("saved!"),
+                  content: Text("save message to file."),
+                )
+              );
+              break;
+            case 1:
+              setState(() {
+                loadIt().then((String value) {
+                  setState(() {
+                    _controller.text = value;
+                  });
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                      title: Text("loaded!"),
+                      content: Text("load message from file."),
+                    )
+                  );
+                });
+              });
+              break;
+            default:
+              print('no default');
+          }
         },
       ),
     );
   }
-}
 
+  Future<File> getDataFile(String filename) async {
+    final directory = await getApplicationDocumentsDirectory();
+    return File(directory.path + '/' + filename);
+  }
+
+  void saveIt(String value) async {
+    getDataFile(_fname).then((File file) {
+      file.writeAsString(value);
+    });
+  }
+
+  Future<String> loadIt() async {
+    try {
+      final file = await getDataFile(_fname);
+      return file.readAsString();
+    } catch (e) {
+      return null;
+    }
+  }
+}
 
