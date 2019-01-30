@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
-
 import 'dart:async';
-import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
 
@@ -56,76 +55,38 @@ class _FirstScreenState extends State<FirstScreen> {
           ),
           Padding( padding: EdgeInsets.all(20.0) ),
           TextField(
+            maxLength: 5,
             controller: _controller,
           )
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            title: Text('Save'),
-            icon: Icon(Icons.save),
-          ),
-          BottomNavigationBarItem(
-            title: Text('Load'),
-            icon: Icon(Icons.open_in_new),
-          ),
-        ],
-        onTap: (int value) {
-          switch(value) {
-            case 0:
-              saveIt(_controller.text);
-              setState(() {
-                _controller.text = '';
-              });
-              showDialog(
-                context: context,
-                builder: (BuildContext context) => AlertDialog(
-                  title: Text("saved!"),
-                  content: Text("save message to file."),
-                )
-              );
-              break;
-            case 1:
-              setState(() {
-                loadIt().then((String value) {
-                  setState(() {
-                    _controller.text = value;
-                  });
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) => AlertDialog(
-                      title: Text("loaded!"),
-                      content: Text("load message from file."),
-                    )
-                  );
-                });
-              });
-              break;
-            default:
-              print('no default');
-          }
-        },
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.open_in_new),
+        onPressed: () => setState(() {
+          loadIt().then((String value) {
+            setState(() {
+              _controller.text = value;
+            });
+            showDialog(
+              context: context,
+              builder: (BuildContext context) => AlertDialog(
+                title: Text("loaded!"),
+                content: Text("load message from Asset."),
+              )
+            );
+          });
+        })
       ),
     );
   }
 
-  Future<File> getDataFile(String filename) async {
-    final directory = await getApplicationDocumentsDirectory();
-    return File(directory.path + '/' + filename);
-  }
-
-  void saveIt(String value) async {
-    getDataFile(_fname).then((File file) {
-      file.writeAsString(value);
-    });
+  Future<String> getDataAsset(String path) async {
+    return await rootBundle.loadString(path);
   }
 
   Future<String> loadIt() async {
     try {
-      final file = await getDataFile(_fname);
-      return file.readAsString();
+      return await getDataAsset(_fname);
     } catch (e) {
       return null;
     }
